@@ -8,10 +8,10 @@ import (
 	"github.com/calavera/dkvolume"
 )
 
-type vboxwebsrvDriver struct {
+type virtualboxDriver struct {
 }
 
-func (g vboxwebsrvDriver) Create(r dkvolume.Request) dkvolume.Response {
+func (d virtualboxDriver) Create(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Creating volume %#v\n", r)
 
 	client := virtualboxclient.New("", "", "http://192.168.99.1:18083")
@@ -32,28 +32,28 @@ func (g vboxwebsrvDriver) Create(r dkvolume.Request) dkvolume.Response {
 	return dkvolume.Response{}
 }
 
-func (g vboxwebsrvDriver) Mount(r dkvolume.Request) dkvolume.Response {
+func (d virtualboxDriver) Mount(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Mounting volume %#v\n", r)
 	return dkvolume.Response{}
 }
 
-func (g vboxwebsrvDriver) Path(r dkvolume.Request) dkvolume.Response {
+func (d virtualboxDriver) Path(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Pathing volume %#v\n", r)
 	return dkvolume.Response{}
 }
 
-func (g vboxwebsrvDriver) Remove(r dkvolume.Request) dkvolume.Response {
+func (d virtualboxDriver) Remove(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Removing volume %#v\n", r)
 	return dkvolume.Response{}
 }
 
-func (g vboxwebsrvDriver) Unmount(r dkvolume.Request) dkvolume.Response {
+func (d virtualboxDriver) Unmount(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Unmounting volume %#v\n", r)
 	return dkvolume.Response{}
 }
 
 func main() {
-	d := vboxwebsrvDriver{}
+	d := virtualboxDriver{}
 	h := dkvolume.NewHandler(d)
 	fmt.Println(h.ServeUnix("root", "vboxwebsrv"))
 }
