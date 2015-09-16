@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/appropriate/go-virtualboxclient/vboxwebsrv"
+	"github.com/appropriate/go-virtualboxclient/virtualboxclient"
 	"github.com/calavera/dkvolume"
 )
 
@@ -14,23 +14,20 @@ type vboxwebsrvDriver struct {
 func (g vboxwebsrvDriver) Create(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Creating volume %#v\n", r)
 
-	svc := vboxwebsrv.NewVboxPortType("http://192.168.99.1:18083", false, nil)
+	client := virtualboxclient.New("", "", "http://192.168.99.1:18083")
 
-	fmt.Printf("Logging on %#v\n", svc)
-	vbox, err := svc.IWebsessionManagerlogon(&vboxwebsrv.IWebsessionManagerlogon{})
-	if err != nil {
+	if err := client.Logon(); err != nil {
 		return dkvolume.Response{Err: err.Error()}
 	}
-	fmt.Printf("Response: %#v\n", vbox)
 
 	location := filepath.Join("/Users/mike/.docker/machine/machines", fmt.Sprintf("%s.vmdk"))
-	request := vboxwebsrv.IVirtualBoxcreateHardDisk{This: vbox.Returnval, Format: "vmdk", Location: location}
-	response, err := svc.IVirtualBoxcreateHardDisk(&request)
+
+	hardDisk, err := client.CreateHardDisk("vmdk", location)
 	if err != nil {
 		return dkvolume.Response{Err: err.Error()}
 	}
 
-	fmt.Printf("Response: %#v\n", response)
+	fmt.Printf("Hard disk: %#v\n", hardDisk)
 
 	return dkvolume.Response{}
 }
