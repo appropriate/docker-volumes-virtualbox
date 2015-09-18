@@ -32,7 +32,7 @@ func (d virtualboxDriver) Create(r dkvolume.Request) dkvolume.Response {
 
 	fmt.Printf("Hard disk: %#v\n", medium)
 
-	if err = medium.CreateBaseStorage(1000000, nil); err != nil {
+	if _, err = medium.CreateBaseStorage(1000000, nil); err != nil {
 		return dkvolume.Response{Err: err.Error()}
 	}
 
@@ -58,7 +58,7 @@ func (d virtualboxDriver) Remove(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Removing volume %#v\n", r)
 
 	if m, ok := d.volumes[r.Name]; ok {
-		if err := m.DeleteStorage(); err != nil {
+		if _, err := m.DeleteStorage(); err != nil {
 			return dkvolume.Response{Err: err.Error()}
 		}
 	}
