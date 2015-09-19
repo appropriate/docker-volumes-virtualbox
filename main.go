@@ -12,10 +12,16 @@ import (
 )
 
 const (
+	pluginId = "virtualbox"
+
 	defaultVboxwebsrvUrl = "http://192.168.99.1:18083"
 )
 
 var (
+	socketAddress    = filepath.Join("/run/docker/plugins", fmt.Sprintf("%s.sock", pluginId))
+	defaultMountRoot = filepath.Join(dkvolume.DefaultDockerRootDirectory, fmt.Sprintf("_%s", pluginId))
+	mountRoot        = flag.String("mount-root", defaultMountRoot, "VirtualBox volumes root mount directory")
+
 	vboxwebsrvUsername = flag.String("vboxwebsrv-username", "", "Username to connect to vboxwebsrv")
 	vboxwebsrvPassword = flag.String("vboxwebsrv-password", "", "Password to connect to vboxwebsrv")
 	vboxwebsrvUrl      = flag.String("vboxwebsrv-url", defaultVboxwebsrvUrl, "URL to connect to vboxwebsrv")
@@ -101,5 +107,6 @@ func main() {
 		volumes: map[string]*virtualboxclient.Medium{},
 	}
 	h := dkvolume.NewHandler(d)
-	fmt.Println(h.ServeUnix("root", "virtualbox"))
+	fmt.Printf("Listening on %s\n", socketAddress)
+	fmt.Println(h.ServeUnix("root", socketAddress))
 }
