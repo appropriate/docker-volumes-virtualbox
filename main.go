@@ -30,8 +30,8 @@ var (
 type virtualboxDriver struct {
 	sync.Mutex
 
-	client  *virtualboxclient.VirtualBoxClient
-	volumes map[string]*virtualboxclient.Medium
+	virtualbox *virtualboxclient.VirtualBox
+	volumes    map[string]*virtualboxclient.Medium
 }
 
 func (d virtualboxDriver) Create(r dkvolume.Request) dkvolume.Response {
@@ -43,7 +43,7 @@ func (d virtualboxDriver) Create(r dkvolume.Request) dkvolume.Response {
 	fmt.Printf("Creating volume %#v\n", r)
 
 	var medium *virtualboxclient.Medium
-	if medium, err = d.client.CreateHardDisk("vmdk", d.storageLocation(r.Name)); err != nil {
+	if medium, err = d.virtualbox.CreateHardDisk("vmdk", d.storageLocation(r.Name)); err != nil {
 		return dkvolume.Response{Err: err.Error()}
 	}
 
@@ -96,15 +96,15 @@ func (d virtualboxDriver) storageLocation(name string) string {
 func main() {
 	flag.Parse()
 
-	client := virtualboxclient.New(*vboxwebsrvUsername, *vboxwebsrvPassword, *vboxwebsrvUrl)
+	virtualbox := virtualboxclient.New(*vboxwebsrvUsername, *vboxwebsrvPassword, *vboxwebsrvUrl)
 
-	if err := client.Logon(); err != nil {
+	if err := virtualbox.Logon(); err != nil {
 		log.Fatal(err)
 	}
 
 	d := virtualboxDriver{
-		client:  client,
-		volumes: map[string]*virtualboxclient.Medium{},
+		virtualbox: virtualbox,
+		volumes:    map[string]*virtualboxclient.Medium{},
 	}
 	h := dkvolume.NewHandler(d)
 	fmt.Printf("Listening on %s\n", socketAddress)
