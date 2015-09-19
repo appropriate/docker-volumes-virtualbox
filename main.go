@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -8,6 +9,16 @@ import (
 
 	"github.com/appropriate/go-virtualboxclient/virtualboxclient"
 	"github.com/calavera/dkvolume"
+)
+
+const (
+	defaultVboxwebsrvUrl = "http://192.168.99.1:18083"
+)
+
+var (
+	vboxwebsrvUsername = flag.String("vboxwebsrv-username", "", "Username to connect to vboxwebsrv")
+	vboxwebsrvPassword = flag.String("vboxwebsrv-password", "", "Password to connect to vboxwebsrv")
+	vboxwebsrvUrl      = flag.String("vboxwebsrv-url", defaultVboxwebsrvUrl, "URL to connect to vboxwebsrv")
 )
 
 type virtualboxDriver struct {
@@ -77,7 +88,9 @@ func (d virtualboxDriver) storageLocation(name string) string {
 
 // TODO: Figure out why Ctrl+C doesn't immediately terminate
 func main() {
-	client := virtualboxclient.New("", "", "http://192.168.99.1:18083")
+	flag.Parse()
+
+	client := virtualboxclient.New(*vboxwebsrvUsername, *vboxwebsrvPassword, *vboxwebsrvUrl)
 
 	if err := client.Logon(); err != nil {
 		log.Fatal(err)
